@@ -1,0 +1,14 @@
+external_libraries = [
+   "GLib",
+   "GObject",
+   "Gio",
+   "libxml2",
+]
+
+[options]
+girs_dir = "/jhbuild/share/gir-1.0"
+library = "Libosinfo"
+version = "1.0"
+min_cfg_version = "1.0"
+target_path = "."
+work_mode = "sys"
