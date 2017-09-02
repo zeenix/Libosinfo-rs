@@ -1,0 +1,17 @@
+[build-dependencies]
+pkg-config = "0.3.7"
+
+[dependencies]
+bitflags = "0.9"
+libc = "0.2"
+
+[features]
+
+[lib]
+name = "libosinfo_sys"
+
+[package]
+build = "build.rs"
+links = "libosinfo"
+name = "libosinfo-sys"
+version = "0.2.0"
