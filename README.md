@@ -19,7 +19,12 @@ Now you have gir tool ready for use. On to actual bindings...
 
 FFI bindings are the low-level unsafe bindings (mostly) generated automatically. To ensure that we don't break API without noticing, we keep the generated bindings in git. To re-generate them against the latest libosinfo on your machine, you use the following command:
 
-```gir/target/release/gir -c sys.toml -d /usr/share/gir-1.0 -m sys -o sys```
+```
+./gir/target/release/gir -c sys.toml -o sys
+cd sys
+cargo build
+cd ..
+```
 
 # High-level safe API
 
