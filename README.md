@@ -21,11 +21,22 @@ FFI bindings are the low-level unsafe bindings (mostly) generated automatically.
 
 ```
 ./gir/target/release/gir -c sys.toml -o sys
+```
+
+If you (for some reason) want to use the FFI bindings rather than the High-level ones, you can simply build them:
+
+```
 cd sys
 cargo build
-cd ..
 ```
 
 # High-level safe API
 
-TBD
+High-level docs are similar:
+
+```
+./gir/target/release/gir -c Gir.toml -o api
+cd api
+cargo build
+cd ..
+```

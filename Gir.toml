@@ -1,0 +1,91 @@
+[options]
+girs_dir = "/usr/share/gir-1.0"
+library = "Libosinfo"
+version = "1.0"
+min_cfg_version = "1.0"
+target_path = "."
+work_mode = "normal"
+
+generate = [
+    # Enums
+    "Libosinfo.DeviceDriverSigningReq",
+    "Libosinfo.InstallConfigParamPolicy",
+    "Libosinfo.MediaError",
+    "Libosinfo.PathFormat",
+    "Libosinfo.ProductRelationship",
+    "Libosinfo.ReleaseStatus",
+
+    # Flags
+    "Libosinfo.InstallScriptInjectionMethod",
+    "Libosinfo.ProductForeachFlag",
+
+    # Classes
+    "Libosinfo.AvatarFormat",
+    "Libosinfo.Datamap",
+    "Libosinfo.DatamapList",
+    "Libosinfo.Db",
+    "Libosinfo.Deployment",
+    "Libosinfo.DeploymentList",
+    "Libosinfo.Device",
+    "Libosinfo.DeviceDriver",
+    "Libosinfo.DeviceDriverList",
+    "Libosinfo.DeviceLink",
+    "Libosinfo.DeviceLinkFilter",
+    "Libosinfo.DeviceLinkList",
+    "Libosinfo.DeviceList",
+    "Libosinfo.Entity",
+    "Libosinfo.Filter",
+    "Libosinfo.InstallConfig",
+    "Libosinfo.InstallConfigParam",
+    "Libosinfo.InstallConfigParamList",
+    "Libosinfo.InstallScriptList",
+    "Libosinfo.List",
+    "Libosinfo.Loader",
+    "Libosinfo.Media",
+    "Libosinfo.MediaList",
+    "Libosinfo.OsList",
+    "Libosinfo.OsVariant",
+    "Libosinfo.OsVariantList",
+    "Libosinfo.Platform",
+    "Libosinfo.PlatformList",
+    "Libosinfo.Product",
+    "Libosinfo.ProductFilter",
+    "Libosinfo.ProductList",
+    "Libosinfo.Resources",
+    "Libosinfo.ResourcesList",
+    "Libosinfo.Tree",
+    "Libosinfo.TreeList",
+]
+
+manual = [
+    "GObject.Object",
+    "GObject.Value",
+    "GLib.Error",
+    "GLib.Date",
+    "Gio.Cancellable",
+    "Gio.File",
+]
+
+# FIXME: Returning enums as integers currently confuses gtk-rs/gir so for now
+# let's just disable all methods that return enum.
+[[object]]
+name = "Libosinfo.InstallScript"
+status = "generate"
+    [[object.function]]
+    name = "get_injection_methods"
+    ignore = true
+
+    [[object.function]]
+    name = "get_post_install_drivers_signing_req"
+    ignore = true
+
+    [[object.function]]
+    name = "get_pre_install_drivers_signing_req"
+    ignore = true
+
+[[object]]
+name = "Libosinfo.Os"
+status = "generate"
+    [[object.function]]
+    name = "get_release_status"
+    ignore = true
