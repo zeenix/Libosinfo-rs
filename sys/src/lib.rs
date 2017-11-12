@@ -117,6 +117,7 @@ pub const OSINFO_MAJOR_VERSION: c_int = 1;
 pub const OSINFO_MEBIBYTES: c_int = 1048576;
 pub const OSINFO_MEDIA_PROP_APPLICATION_ID: *const c_char = b"application-id\0" as *const u8 as *const c_char;
 pub const OSINFO_MEDIA_PROP_ARCHITECTURE: *const c_char = b"architecture\0" as *const u8 as *const c_char;
+pub const OSINFO_MEDIA_PROP_EJECT_AFTER_INSTALL: *const c_char = b"eject-after-install\0" as *const u8 as *const c_char;
 pub const OSINFO_MEDIA_PROP_INITRD: *const c_char = b"initrd\0" as *const u8 as *const c_char;
 pub const OSINFO_MEDIA_PROP_INSTALLER: *const c_char = b"installer\0" as *const u8 as *const c_char;
 pub const OSINFO_MEDIA_PROP_INSTALLER_REBOOTS: *const c_char = b"installer-reboots\0" as *const u8 as *const c_char;
@@ -133,7 +134,7 @@ pub const OSINFO_MEDIA_PROP_VOLUME_ID: *const c_char = b"volume-id\0" as *const 
 pub const OSINFO_MEDIA_PROP_VOLUME_SIZE: *const c_char = b"volume-size\0" as *const u8 as *const c_char;
 pub const OSINFO_MEGAHERTZ: c_int = 1000000;
 pub const OSINFO_MICRO_VERSION: c_int = 0;
-pub const OSINFO_MINOR_VERSION: c_int = 0;
+pub const OSINFO_MINOR_VERSION: c_int = 2;
 pub const OSINFO_OS_PROP_DISTRO: *const c_char = b"distro\0" as *const u8 as *const c_char;
 pub const OSINFO_OS_PROP_FAMILY: *const c_char = b"family\0" as *const u8 as *const c_char;
 pub const OSINFO_OS_PROP_RELEASE_STATUS: *const c_char = b"release-status\0" as *const u8 as *const c_char;
@@ -177,21 +178,6 @@ pub const OSINFO_INSTALL_SCRIPT_INJECTION_METHOD_DISK: OsinfoInstallScriptInject
 pub const OSINFO_INSTALL_SCRIPT_INJECTION_METHOD_FLOPPY: OsinfoInstallScriptInjectionMethod = OsinfoInstallScriptInjectionMethod::FLOPPY;
 pub const OSINFO_INSTALL_SCRIPT_INJECTION_METHOD_INITRD: OsinfoInstallScriptInjectionMethod = OsinfoInstallScriptInjectionMethod::INITRD;
 pub const OSINFO_INSTALL_SCRIPT_INJECTION_METHOD_WEB: OsinfoInstallScriptInjectionMethod = OsinfoInstallScriptInjectionMethod::WEB;
-
-bitflags! {
-    #[repr(C)]
-    pub struct OsinfoProductForeachFlag: c_uint {
-        const DERIVES_FROM = 1;
-        const UPGRADES = 2;
-        const CLONES = 4;
-    }
-}
-pub const OSINFO_PRODUCT_FOREACH_FLAG_DERIVES_FROM: OsinfoProductForeachFlag = OsinfoProductForeachFlag::DERIVES_FROM;
-pub const OSINFO_PRODUCT_FOREACH_FLAG_UPGRADES: OsinfoProductForeachFlag = OsinfoProductForeachFlag::UPGRADES;
-pub const OSINFO_PRODUCT_FOREACH_FLAG_CLONES: OsinfoProductForeachFlag = OsinfoProductForeachFlag::CLONES;
-
-// Callbacks
-pub type OsinfoProductForeach = Option<unsafe extern "C" fn(*mut OsinfoProduct, gpointer)>;
 
 // Records
 #[repr(C)]
@@ -848,8 +834,6 @@ extern "C" {
     // OsinfoDeviceDriver
     //=========================================================================
     pub fn osinfo_device_driver_get_type() -> GType;
-    pub fn osinfo_device_driver_new(id: *const c_char) -> *mut OsinfoDeviceDriver;
-    pub fn osinfo_device_driver_add_device(driver: *mut OsinfoDeviceDriver, device: *mut OsinfoDevice);
     pub fn osinfo_device_driver_get_architecture(driver: *mut OsinfoDeviceDriver) -> *const c_char;
     pub fn osinfo_device_driver_get_devices(driver: *mut OsinfoDeviceDriver) -> *mut OsinfoDeviceList;
     pub fn osinfo_device_driver_get_files(driver: *mut OsinfoDeviceDriver) -> *mut glib::GList;
@@ -988,11 +972,11 @@ extern "C" {
     //=========================================================================
     pub fn osinfo_install_config_param_get_type() -> GType;
     pub fn osinfo_install_config_param_new(name: *const c_char) -> *mut OsinfoInstallConfigParam;
-    pub fn osinfo_install_config_param_get_name(config_param: *const OsinfoInstallConfigParam) -> *const c_char;
-    pub fn osinfo_install_config_param_get_policy(config_param: *const OsinfoInstallConfigParam) -> OsinfoInstallConfigParamPolicy;
-    pub fn osinfo_install_config_param_get_value_map(config_param: *const OsinfoInstallConfigParam) -> *mut OsinfoDatamap;
-    pub fn osinfo_install_config_param_is_optional(config_param: *const OsinfoInstallConfigParam) -> gboolean;
-    pub fn osinfo_install_config_param_is_required(config_param: *const OsinfoInstallConfigParam) -> gboolean;
+    pub fn osinfo_install_config_param_get_name(config_param: *mut OsinfoInstallConfigParam) -> *const c_char;
+    pub fn osinfo_install_config_param_get_policy(config_param: *mut OsinfoInstallConfigParam) -> OsinfoInstallConfigParamPolicy;
+    pub fn osinfo_install_config_param_get_value_map(config_param: *mut OsinfoInstallConfigParam) -> *mut OsinfoDatamap;
+    pub fn osinfo_install_config_param_is_optional(config_param: *mut OsinfoInstallConfigParam) -> gboolean;
+    pub fn osinfo_install_config_param_is_required(config_param: *mut OsinfoInstallConfigParam) -> gboolean;
     pub fn osinfo_install_config_param_set_value_map(config_param: *mut OsinfoInstallConfigParam, datamap: *mut OsinfoDatamap);
 
     //=========================================================================
@@ -1008,7 +992,6 @@ extern "C" {
     pub fn osinfo_install_script_new(id: *const c_char) -> *mut OsinfoInstallScript;
     pub fn osinfo_install_script_new_data(id: *const c_char, profile: *const c_char, templateData: *const c_char) -> *mut OsinfoInstallScript;
     pub fn osinfo_install_script_new_uri(id: *const c_char, profile: *const c_char, templateUri: *const c_char) -> *mut OsinfoInstallScript;
-    pub fn osinfo_install_script_add_config_param(script: *mut OsinfoInstallScript, param: *mut OsinfoInstallConfigParam);
     pub fn osinfo_install_script_generate(script: *mut OsinfoInstallScript, os: *mut OsinfoOs, config: *mut OsinfoInstallConfig, cancellable: *mut gio::GCancellable, error: *mut *mut glib::GError) -> *mut c_char;
     pub fn osinfo_install_script_generate_async(script: *mut OsinfoInstallScript, os: *mut OsinfoOs, config: *mut OsinfoInstallConfig, cancellable: *mut gio::GCancellable, callback: gio::GAsyncReadyCallback, user_data: gpointer);
     pub fn osinfo_install_script_generate_command_line(script: *mut OsinfoInstallScript, os: *mut OsinfoOs, config: *mut OsinfoInstallConfig) -> *mut c_char;
@@ -1026,9 +1009,9 @@ extern "C" {
     pub fn osinfo_install_script_get_avatar_format(script: *mut OsinfoInstallScript) -> *mut OsinfoAvatarFormat;
     pub fn osinfo_install_script_get_can_post_install_drivers(script: *mut OsinfoInstallScript) -> gboolean;
     pub fn osinfo_install_script_get_can_pre_install_drivers(script: *mut OsinfoInstallScript) -> gboolean;
-    pub fn osinfo_install_script_get_config_param(script: *const OsinfoInstallScript, name: *const c_char) -> *mut OsinfoInstallConfigParam;
-    pub fn osinfo_install_script_get_config_param_list(script: *const OsinfoInstallScript) -> *mut glib::GList;
-    pub fn osinfo_install_script_get_config_params(script: *const OsinfoInstallScript) -> *mut OsinfoInstallConfigParamList;
+    pub fn osinfo_install_script_get_config_param(script: *mut OsinfoInstallScript, name: *const c_char) -> *mut OsinfoInstallConfigParam;
+    pub fn osinfo_install_script_get_config_param_list(script: *mut OsinfoInstallScript) -> *mut glib::GList;
+    pub fn osinfo_install_script_get_config_params(script: *mut OsinfoInstallScript) -> *mut OsinfoInstallConfigParamList;
     pub fn osinfo_install_script_get_expected_filename(script: *mut OsinfoInstallScript) -> *const c_char;
     //pub fn osinfo_install_script_get_injection_methods(script: *mut OsinfoInstallScript) -> /*Metadata mismatch*/[c:type mismatch unsigned int != OsinfoInstallScriptInjectionMethod of InstallScriptInjectionMethod];
     pub fn osinfo_install_script_get_needs_internet(script: *mut OsinfoInstallScript) -> gboolean;
@@ -1041,9 +1024,8 @@ extern "C" {
     pub fn osinfo_install_script_get_profile(script: *mut OsinfoInstallScript) -> *const c_char;
     pub fn osinfo_install_script_get_template_data(script: *mut OsinfoInstallScript) -> *const c_char;
     pub fn osinfo_install_script_get_template_uri(script: *mut OsinfoInstallScript) -> *const c_char;
-    pub fn osinfo_install_script_has_config_param(script: *const OsinfoInstallScript, config_param: *const OsinfoInstallConfigParam) -> gboolean;
-    pub fn osinfo_install_script_has_config_param_name(script: *const OsinfoInstallScript, name: *const c_char) -> gboolean;
-    pub fn osinfo_install_script_set_avatar_format(script: *mut OsinfoInstallScript, avatar: *mut OsinfoAvatarFormat);
+    pub fn osinfo_install_script_has_config_param(script: *mut OsinfoInstallScript, config_param: *mut OsinfoInstallConfigParam) -> gboolean;
+    pub fn osinfo_install_script_has_config_param_name(script: *mut OsinfoInstallScript, name: *const c_char) -> gboolean;
     pub fn osinfo_install_script_set_output_prefix(script: *mut OsinfoInstallScript, prefix: *const c_char);
 
     //=========================================================================
@@ -1098,6 +1080,7 @@ extern "C" {
     pub fn osinfo_media_create_from_location_finish(res: *mut gio::GAsyncResult, error: *mut *mut glib::GError) -> *mut OsinfoMedia;
     pub fn osinfo_media_get_application_id(media: *mut OsinfoMedia) -> *const c_char;
     pub fn osinfo_media_get_architecture(media: *mut OsinfoMedia) -> *const c_char;
+    pub fn osinfo_media_get_eject_after_install(media: *mut OsinfoMedia) -> gboolean;
     pub fn osinfo_media_get_initrd_path(media: *mut OsinfoMedia) -> *const c_char;
     pub fn osinfo_media_get_installer(media: *mut OsinfoMedia) -> gboolean;
     pub fn osinfo_media_get_installer_reboots(media: *mut OsinfoMedia) -> c_int;
@@ -1111,8 +1094,6 @@ extern "C" {
     pub fn osinfo_media_get_url(media: *mut OsinfoMedia) -> *const c_char;
     pub fn osinfo_media_get_volume_id(media: *mut OsinfoMedia) -> *const c_char;
     pub fn osinfo_media_get_volume_size(media: *mut OsinfoMedia) -> i64;
-    pub fn osinfo_media_set_languages(media: *mut OsinfoMedia, languages: *mut glib::GList);
-    pub fn osinfo_media_set_os(media: *mut OsinfoMedia, os: *mut OsinfoOs);
 
     //=========================================================================
     // OsinfoMediaList
@@ -1201,7 +1182,6 @@ extern "C" {
     //=========================================================================
     pub fn osinfo_product_get_type() -> GType;
     pub fn osinfo_product_add_related(product: *mut OsinfoProduct, relshp: OsinfoProductRelationship, otherproduct: *mut OsinfoProduct);
-    pub fn osinfo_product_foreach_related(product: *mut OsinfoProduct, flags: c_uint, foreach_func: OsinfoProductForeach, user_data: gpointer);
     pub fn osinfo_product_get_codename(prod: *mut OsinfoProduct) -> *const c_char;
     pub fn osinfo_product_get_eol_date(prod: *mut OsinfoProduct) -> *mut glib::GDate;
     pub fn osinfo_product_get_eol_date_string(prod: *mut OsinfoProduct) -> *const c_char;
