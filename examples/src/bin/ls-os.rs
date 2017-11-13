@@ -12,14 +12,33 @@ extern crate glib;
 use glib::prelude::*;
 use libosinfo::prelude::*;
 
+use std::env;
+
 fn main() {
     let loader = libosinfo::Loader::new();
     loader.process_default_path().unwrap();
     let db = loader.get_db().unwrap();
 
     let os_list = db.get_os_list().unwrap();
-    for i in 0..os_list.get_length() {
-        let os: libosinfo::Product = os_list.get_nth(i).unwrap().downcast().unwrap();
-        println!("{}", os.get_name().unwrap());
+    let args: Vec<_> = env::args().collect();
+    for e in os_list.get_elements() {
+        let os: libosinfo::Product = e.downcast().unwrap();
+        let name = os.get_name().unwrap();
+
+        if args.len() > 1 && !name.contains(&args[1]) {
+            continue;
+        }
+
+        println!("{}", name);
+        if let Some(v) = os.get_vendor() {
+            println!("\tvendor: {}", v);
+        }
+        if let Some(c) = os.get_codename() {
+            println!("\tcodename: {}", c);
+        }
+        if let Some(r) = os.get_release_date_string() {
+            println!("\tReleased: {}", r);
+        }
+        println!("");
     }
 }
